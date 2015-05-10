@@ -231,13 +231,13 @@ docker创建、启动container时执行的命令，如果设置了ENTRYPOINT，�
 6.删除con03
 
 ```
-    # docker ps -a
-    CONTAINER ID        IMAGE                    COMMAND                CREATED             STATUS                      PORTS                                                 NAMES
-    efc9bda4a2ff        csphere/test:0.1         "/usr/local/bin/run    4 minutes ago       Up 17 seconds                                                                     con03               
-    99aa6ee25adc        busybox:latest           "/bin/sh"              14 minutes ago      Exited (0) 12 minutes ago                                                         con02               
-    831c93de9b9f        busybox:latest           "/bin/sh"              2 hours ago         Up 27 minutes                                                                     con01
-    # docker rm con02     #容器停止的状态
-    # docker rm -f con03  #容器开启的状态
+# docker ps -a
+CONTAINER ID        IMAGE                    COMMAND                CREATED             STATUS                      PORTS                                             NAMES
+efc9bda4a2ff        csphere/test:0.1         "/usr/local/bin/run    4 minutes ago       Up 17 seconds                                                                 con03               
+99aa6ee25adc        busybox:latest           "/bin/sh"              14 minutes ago      Exited (0) 12 minutes ago                                                     con02               
+831c93de9b9f        busybox:latest           "/bin/sh"              2 hours ago         Up 27 minutes                                                                 con01
+# docker rm con02     #容器停止的状态
+# docker rm -f con03  #容器开启的状态
 ```
 
 ###镜像操作
