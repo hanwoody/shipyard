@@ -1,6 +1,7 @@
 #cSphere入群Docker基础：
 
 这篇基础文章是方便cSphere用户在使用cSphere平台之前了解的基础。
+
 针对的用户是已经有一定的Linux基础知识。
 
 ##Docker是什么
@@ -13,22 +14,25 @@ Docker是一个改进的容器技术。具体的“改进”体现在，Docker�
 - 隔离，沙盒技术更像虚拟机
 
 ###Docker技术的基础：
+
 - namespace，容器隔离的基础，保证A容器看不到B容器. 6个名空间：User,Mnt,Network,UTS,IPC,Pid
 - cgroups，容器资源统计和隔离。主要用到的cgroups子系统：cpu,blkio,device,freezer,memory
 - unionfs，典型：aufs/overlayfs，分层镜像实现的基础
 
 ###Docker组件：
+
 - **docker Client**客户端------------>向docker服务器进程发起请求，如:创建、停止、销毁容器等操作
 - **docker Server**服务器进程----->处理所有docker的请求，管理所有容器
 - **docker Registry**镜像仓库------>镜像存放的中央仓库，可看作是存放二进制的scm
 
 ## Docker安装 ##
 Docker的安装非常简单，支持目前所有主流操作系统，从Mac到Windows到各种Linux发行版
-具体参考： `https://docs.docker.com/installation/`
+具体参考： [docker安装](https://docs.docker.com/installation/)
 
 ## Docker常见命令 ##
 
 #### 容器相关操作
+
 - docker create   # 创建一个容器但是不启动它
 - docker run      # 创建并启动一个容器
 - docker stop     # 停止容器运行，发送信号SIGTERM
@@ -39,7 +43,8 @@ Docker的安装非常简单，支持目前所有主流操作系统，从Mac到Wi
 - docker attach   # 连接(进入)到一个正在运行的容器
 - docker wait     # 阻塞到一个容器，直到容器停止运行
 
-#### 获取相关信息
+#### 获取容器相关信息
+
 - docker ps       # 显示状态为运行（Up）的容器
 - docker ps -a    # 显示所有容器,包括运行中（Up）的和退出的(Exited)
 - docker inspect  # 深入容器内部获取容器所有信息
@@ -50,13 +55,16 @@ Docker的安装非常简单，支持目前所有主流操作系统，从Mac到Wi
 - docker diff     # 显示容器文件系统的前后变化
 
 #### 导出容器
-    docker cp       # 从容器里向外拷贝文件或目录
-    docker export   # 将容器整个文件系统导出为一个tar包，不带layers、tag等信息
+
+- docker cp       # 从容器里向外拷贝文件或目录
+- docker export   # 将容器整个文件系统导出为一个tar包，不带layers、tag等信息
 
 #### 执行
-    docker exec     # 在容器里执行一个命令，可以执行bash进入交互式
+
+- docker exec     # 在容器里执行一个命令，可以执行bash进入交互式
 
 #### 镜像操作
+
 - docker images   # 显示本地所有的镜像列表
 - docker import   # 从一个tar包创建一个镜像，往往和export结合使用
 - docker build    # 使用Dockerfile创建镜像（推荐）
@@ -68,30 +76,38 @@ Docker的安装非常简单，支持目前所有主流操作系统，从Mac到Wi
 - docker tag      # 为镜像起一个别名
 
 #### 镜像仓库(registry)操作
+
 - docker login    # 登录到一个registry
 - docker search   # 从registry仓库搜索镜像
 - docker pull     # 从仓库下载镜像到本地
 - docker push     # 将一个镜像push到registry仓库中
 
 #### 获取Container IP地址（Container状态必须是Up）
+
     docker inspect id | grep IPAddress | cut -d '"' -f 4
 
 #### 获取端口映射
+
     docker inspect -f '{{range $p, $conf := .NetworkSettings.Ports}} {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' id
 
 #### 获取环境变量
-    docker exec id env
+
+    docker exec container_id env
 
 #### 杀掉所有正在运行的容器
+
     docker kill $(docker ps -q)
 
 #### 删除老的(一周前创建)容器
+
     docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs docker rm
 
 #### 删除已经停止的容器
+
     docker rm `docker ps -a -q`
 
 #### 删除所有镜像，小心
+
     docker rmi $(docker images -q)
 
 ## Dockerfile
@@ -101,47 +117,59 @@ Dockerfile是docker构建镜像的基础，也是docker区别于其他容器的�
 不论是开发还是运维，学会编写Dockerfile几乎是必备的，这有助于你理解整个容器的运行。
 
 ####FROM <image name>, 从一个基础镜像构建新的镜像
-FROM ubuntu 
+
+    FROM ubuntu 
 
 #### MAINTAINER <author name>, 维护者信息
-MAINTAINER William <wlj@nicescale.com>
+
+    MAINTAINER William <wlj@nicescale.com>
 
 #### ENV <key> <value>, 设置环境变量
-ENV TEST 1
+
+    ENV TEST 1
 
 #### RUN <command>, 非交互式运行shell命令
-RUN apt-get -y update 
 
-RUN apt-get -y install nginx
+    RUN apt-get -y update 
+    RUN apt-get -y install nginx
 
 #### ADD <src> <dst>, 将外部文件拷贝到镜像里,src可以为url
-ADD http://nicescale.com/  /data/nicescale.tgz
+
+    ADD http://nicescale.com/  /data/nicescale.tgz
 
 #### WORKDIR /path/to/workdir, 设置工作目录
-WORKDIR /var/www
+
+    WORKDIR /var/www
 
 #### USER <uid>, 设置用户ID
-USER nginx
+
+    USER nginx
 
 #### VULUME <#dir>, 设置volume
-VOLUME [‘/data’]
+
+    VOLUME [‘/data’]
 
 #### EXPOSE <port>, 暴露哪些端口
-EXPOSE 80 443 
+
+    EXPOSE 80 443 
 
 #### ENTRYPOINT [‘executable’, ‘param1’,’param2’]执行命令
-ENTRYPOINT ["/usr/sbin/nginx"]
+
+    ENTRYPOINT ["/usr/sbin/nginx"]
 
 #### CMD [“param1","param2"]
-CMD ["start"]
+
+    CMD ["start"]
 
 docker创建、启动container时执行的命令，如果设置了ENTRYPOINT，则CMD将作为参数</usr/sbin/nginx start>
 
 #### Dockerfile最佳实践
+
 - 尽量将一些常用不变的指令放到前面
 - CMD和ENTRYPOINT尽量使用json数组方式
 
 #### 通过Dockerfile构建image
+
     docker build csphere/nginx:1.7 .
 
 ## 镜像仓库Registry
@@ -227,7 +255,7 @@ docker创建、启动container时执行的命令，如果设置了ENTRYPOINT，�
 
 3.查找镜像仓库的某个镜像
 
-    # docker search centso/nginx
+    # docker search centos/nginx
     NAME                                     DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
     johnnyzheng/centos-nginx-php-wordpress                                                   1                    [OK]
     sergeyzh/centos6-nginx                                                                   1                    [OK]
